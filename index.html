@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Project</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sign Language Project</h1>
+    <div>
+        <button onclick="runScript('hand')">Run Hand Gesture Recognition</button>
+    </div>
+    <div>
+        <input type="text" id="wordInput" placeholder="Enter word or phrase" />
+        <button onclick="runCombo()">Run Text-to-Avatar</button>
+    </div>
+    <div>
+        <button onclick="runSpeech()">Run Speech-to-Avatar</button>
+    </div>
+    <div id="status"></div>
+
+    <script>
+        async function runScript(code) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerText = "Running...";
+            try {
+                const response = await fetch(`/run_${code}`, { method: 'POST' });
+                const result = await response.json();
+                if (result.status === "success") {
+                    statusDiv.innerText = result.message;
+                } else {
+                    statusDiv.innerText = `Error: ${result.message}`;
+                }
+            } catch (error) {
+                statusDiv.innerText = "Error connecting to the server!";
+            }
+        }
+
+        async function runCombo() {
+            const wordInput = document.getElementById('wordInput').value;
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerText = "Running...";
+            try {
+                const response = await fetch('/run_combo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ word: wordInput })
+                });
+                const result = await response.json();
+                if (result.status === "success") {
+                    statusDiv.innerText = result.message;
+                } else {
+                    statusDiv.innerText = `Error: ${result.message}`;
+                }
+            } catch (error) {
+                statusDiv.innerText = "Error connecting to the server!";
+            }
+        }
+
+        async function runSpeech() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerText = "Running Speech Recognition...";
+            try {
+                const response = await fetch('/run_speech', { method: 'POST' });
+                const result = await response.json();
+                if (result.status === "success") {
+                    statusDiv.innerText = result.message;
+                } else {
+                    statusDiv.innerText = `Error: ${result.message}`;
+                }
+            } catch (error) {
+                statusDiv.innerText = "Error connecting to the server!";
+            }
+        }
+    </script>
+</body>
+</html>
